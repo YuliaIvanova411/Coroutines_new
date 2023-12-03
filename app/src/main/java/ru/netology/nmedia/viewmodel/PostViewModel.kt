@@ -26,7 +26,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: PostRepository =
         PostRepositoryImpl(AppDb.getInstance(context = application).postDao())
 
-    val data: LiveData<FeedModel> = repository.data.map(::FeedModel)
+    val data: LiveData<FeedModel> = repository.data.map{FeedModel(posts = it, empty = it.isEmpty())}
     private val _dataState = MutableLiveData<FeedModelState>()
     val dataState: LiveData<FeedModelState>
         get() = _dataState
@@ -88,10 +88,46 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun likeById(id: Long) {
-        TODO()
+        edited.value?.let {
+            _postCreated.value = Unit
+
+            viewModelScope.launch {
+                try {
+                    repository.likeById(id)
+                    _dataState.value = FeedModelState()
+                } catch (e: Exception) {
+                    _dataState.value = FeedModelState(error = true)
+                }
+            }
+        }
+        edited.value = empty
+    }
+    fun dislikeById(id: Long) {
+        edited.value?.let {
+
+            _postCreated.value = Unit
+            viewModelScope.launch {
+                try {
+                    repository.dislikeById(id)
+                    _dataState.value = FeedModelState()
+                } catch (e: Exception) {
+                    _dataState.value = FeedModelState(error = true)
+                }
+            }
+        }
+        edited.value = empty
+
     }
 
     fun removeById(id: Long) {
-        TODO()
+        viewModelScope.launch{
+            try{
+            repository.removeById(id)
+        } catch (e: Exception) {
+            _dataState.value = FeedModelState(error = true)
+
+            }
+        }
+
     }
 }
