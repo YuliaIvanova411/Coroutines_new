@@ -1,6 +1,10 @@
 package ru.netology.nmedia.repository
 
 import androidx.lifecycle.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import okio.IOException
 import ru.netology.nmedia.api.*
 import ru.netology.nmedia.dao.PostDao
@@ -11,9 +15,31 @@ import ru.netology.nmedia.entity.toEntity
 import ru.netology.nmedia.error.ApiError
 import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
+import java.util.concurrent.CancellationException
 
 class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
-    override val data = dao.getAll().map(List<PostEntity>::toDto)
+    override val data: Flow<List<Post>> = dao.getAllVisible().map(List<PostEntity>::toDto)
+    override fun getNewerCount(id: Long): Flow<Int> = flow {
+        while (true) {
+            delay(10_000)
+            try {
+            val response = PostsApi.service.getNewer(id)
+            val posts = response.body().orEmpty()
+            dao.insert(posts.toEntity().map {
+                it.copy(hidden = true)
+            })
+            emit(posts.size)
+        } catch (e: CancellationException) {
+            throw e
+            }   catch (e: Exception){
+                e.printStackTrace()
+            }
+        }
+    }
+
+    override suspend fun showNewPosts() {
+        dao.readNew()
+    }
 
     override suspend fun getAll() {
         try {
