@@ -78,10 +78,12 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
         val deletedPost = dao.getById(id)
         dao.removeById(id)
         try {
+
             val response = PostsApi.service.removeById(id)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
+
         } catch (e: IOException) {
             dao.insert(deletedPost)
             throw NetworkError
@@ -100,6 +102,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
             if(!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
+
         } catch (e : IOException) {
             dao.likeById(likePost.id)
             throw NetworkError
@@ -117,6 +120,7 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
+
 
         } catch (e : IOException) {
             dao.likeById(likePost.id)
