@@ -18,7 +18,7 @@ import ru.netology.nmedia.error.UnknownError
 import java.util.concurrent.CancellationException
 
 class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
-    override val data: Flow<List<Post>> = dao.getAll().map(List<PostEntity>::toDto)
+    override val data: Flow<List<Post>> = dao.getAllVisible().map(List<PostEntity>::toDto)
     override fun getNewerCount(id: Long): Flow<Int> = flow {
         while (true) {
             delay(10_000)
@@ -75,48 +75,54 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
 
 
     override suspend fun removeById(id: Long) {
+        val deletedPost = dao.getById(id)
+        dao.removeById(id)
         try {
             val response = PostsApi.service.removeById(id)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
-            dao.removeById(id)
         } catch (e: IOException) {
+            dao.insert(deletedPost)
             throw NetworkError
         }
         catch (e: Exception) {
+            dao.insert(deletedPost)
             throw UnknownError
         }
     }
 
     override suspend fun likeById(id: Long) {
+        val likePost = dao.getById(id)
+        dao.likeById(likePost.id)
         try {
             val response = PostsApi.service.likeById(id)
             if(!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(PostEntity.fromDto(body))
         } catch (e : IOException) {
+            dao.likeById(likePost.id)
             throw NetworkError
         }
         catch (e: Exception) {
+            dao.likeById(likePost.id)
             throw UnknownError
         }
     }
     override suspend fun dislikeById(id: Long) {
+        val likePost = dao.getById(id)
+        dao.likeById(likePost.id)
         try {
             val response = PostsApi.service.dislikeById(id)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
 
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(PostEntity.fromDto(body))
-
         } catch (e : IOException) {
+            dao.likeById(likePost.id)
             throw NetworkError
         } catch (e : Exception) {
+            dao.likeById(likePost.id)
             throw UnknownError
         }
     }
