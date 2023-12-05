@@ -23,4 +23,10 @@
     <string name="channel_remote_description">Уведомления с удалённого сервера</string>
     <string name="load_new_posts" >Загрузка новых постов</string>
     <string name="description_load_new_posts" >Загрузить новые посты</string>
+    <string name="description_select_photo" >Выбрать фото из галереи</string>
+    <string name="description_take_photo" >Сделать фото</string>
+    <string name="clear" >Очистить предпросмотр</string>
+    <string name="pick_photo_error">Ошибка выбора фото</string>
+    <string name="description_full_screen_image">Во весь экран</string>
+    <string name="image" />
 </resources>

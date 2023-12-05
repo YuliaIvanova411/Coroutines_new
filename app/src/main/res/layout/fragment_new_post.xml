@@ -5,31 +5,74 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activity.NewPostFragment">
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+   <LinearLayout
+       android:paddingBottom="?actionBarSize"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/edit"
+       <EditText
+           android:id="@+id/edit"
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           android:background="@android:color/transparent"
+           android:gravity="start|top"
+           android:inputType="textMultiLine"
+           tools:text="@tools:sample/lorem[200]" />
+
+       <FrameLayout
+        android:id="@+id/previewContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="start|top"
-        android:inputType="textMultiLine"
-        android:background="@android:color/transparent"
-        />
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/preview"
+            android:adjustViewBounds="true"
+            tools:srcCompat="@tools:sample/avatars[7]"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/clear"
+            android:layout_gravity="bottom|center_horizontal"
+            android:text="@string/clear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+</FrameLayout>
 
-    <com.google.android.material.bottomappbar.BottomAppBar
+    </LinearLayout>
+</ScrollView>
+
+    <LinearLayout
+        android:orientation="horizontal"
         android:id="@+id/bottomAppBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?actionBarSize"
         android:layout_gravity="bottom"
-        style="@style/Widget.MaterialComponents.BottomAppBar.Colored"
-        />
+        android:background="?colorPrimary">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/ok"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="@string/description_post_save"
-        app:srcCompat="@drawable/ic_ok_24dp"
-        app:layout_anchor="@id/bottomAppBar"
-        />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/pickPhoto"
+            android:background="?selectableItemBackground"
+            style="@style/Widget.AppTheme.IconButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/description_select_photo"
+            android:padding="@dimen/common_spacing"
+            app:icon="@drawable/ic_pick_photo_24" />
+
+        <com.google.android.material.button.MaterialButton
+            android:background="?selectableItemBackground"
+            android:id="@+id/camera"
+            style="@style/Widget.AppTheme.IconButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/description_take_photo"
+            android:padding="@dimen/common_spacing"
+            app:icon="@drawable/ic_camera_24" />
+    </LinearLayout>
+
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

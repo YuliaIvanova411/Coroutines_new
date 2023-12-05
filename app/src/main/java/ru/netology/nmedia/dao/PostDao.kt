@@ -33,9 +33,6 @@ interface PostDao {
     @Query("SELECT COUNT(*) FROM PostEntity WHERE hidden = 1")
     suspend fun newerCount(): Int
 
-    @Query("SELECT * FROM PostEntity WHERE id = :id")
-    suspend fun getById(id: Long): PostEntity
-
 
     @Query("UPDATE PostEntity SET content = :content WHERE id = :id")
     suspend fun updateContentById(id: Long, content: String)

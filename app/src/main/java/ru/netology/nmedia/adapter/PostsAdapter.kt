@@ -1,6 +1,7 @@
 package ru.netology.nmedia.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
@@ -11,12 +12,14 @@ import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.view.loadCircleCrop
+import ru.netology.nmedia.view.loadAttachment
 
 interface OnInteractionListener {
     fun onLike(post: Post) {}
     fun onEdit(post: Post) {}
     fun onRemove(post: Post) {}
     fun onShare(post: Post) {}
+    fun onAttachment(post: Post)
 }
 
 class PostsAdapter(
@@ -37,6 +40,7 @@ class PostViewHolder(
     private val binding: CardPostBinding,
     private val onInteractionListener: OnInteractionListener,
 ) : RecyclerView.ViewHolder(binding.root) {
+    private val attachmentUrl = "${BuildConfig.BASE_URL}/media/"
 
     fun bind(post: Post) {
         binding.apply {
@@ -73,6 +77,17 @@ class PostViewHolder(
 
             share.setOnClickListener {
                 onInteractionListener.onShare(post)
+            }
+
+            if (post.attachment != null) {
+                attachment.visibility = View.VISIBLE
+                attachment.loadAttachment(attachmentUrl + post.attachment.url)
+            } else {
+                attachment.visibility = View.GONE
+            }
+
+            attachment.setOnClickListener {
+                onInteractionListener.onAttachment(post)
             }
         }
     }

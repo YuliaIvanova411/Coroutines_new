@@ -14,3 +14,8 @@ fun ImageView.load(url: String, vararg transforms: BitmapTransformation = emptyA
 
 fun ImageView.loadCircleCrop(url: String, vararg transforms: BitmapTransformation = emptyArray()) =
     load(url, CircleCrop(), *transforms)
+
+fun ImageView.loadAttachment(url: String) = Glide.with(this)
+    .load(url)
+    .timeout(10_000)
+    .into(this)

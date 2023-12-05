@@ -22,4 +22,10 @@
     <string name="channel_remote_description">Notifications from remote server</string>
     <string name="load_new_posts" >New posts</string>
     <string name="description_load_new_posts">Load new posts</string>
+    <string name="description_select_photo" >Select photo from gallery</string>
+    <string name="description_take_photo">Take photo</string>
+    <string name="clear" >Clear preview</string>
+    <string name="pick_photo_error">Pick photo error</string>
+    <string name="description_full_screen_image" >Full screen</string>
+    />
 </resources>

@@ -5,16 +5,22 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import okio.IOException
 import ru.netology.nmedia.api.*
 import ru.netology.nmedia.dao.PostDao
+import ru.netology.nmedia.dto.Attachment
+import ru.netology.nmedia.dto.Media
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.toDto
 import ru.netology.nmedia.entity.toEntity
+import ru.netology.nmedia.enumeration.AttachmentType
 import ru.netology.nmedia.error.ApiError
 import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
+import java.io.File
 import java.util.concurrent.CancellationException
 
 class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
@@ -92,6 +98,34 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
             dao.insert(deletedPost)
             throw UnknownError
         }
+    }
+
+    override suspend fun saveWithAttachment(post: Post, file: File) {
+        try {
+            val media = uploadMedia(file)
+            val response = PostsApi.service.save(post.copy(attachment = Attachment(url = media.id, AttachmentType.IMAGE),))
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            dao.insert(PostEntity.fromDto(body))
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    private suspend fun uploadMedia(file: File): Media {
+        val formData = MultipartBody.Part.createFormData(
+            "file", file.name, file.asRequestBody()
+        )
+        val response = PostsApi.service.uploadMedia(formData)
+        if (!response.isSuccessful) {
+            throw ApiError(response.code(), response.message())
+        }
+        return response.body() ?: throw ApiError(response.code(), response.message())
     }
 
     override suspend fun likeById(id: Long) {
